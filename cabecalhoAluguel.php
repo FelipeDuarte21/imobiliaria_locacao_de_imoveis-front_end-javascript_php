@@ -44,7 +44,7 @@
                 </li>
 
                 <li class="nav-item mr-2" id="proprietario">
-                    <a href="proprietario.html" class="nav-link">
+                    <a href="proprietario.php" class="nav-link">
                         <i class="fas fa-fw fa-user-tie"></i>
                         <span class="nav-link-text">Proprietário</span>
                     </a>
