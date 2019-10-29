@@ -66,42 +66,6 @@ class Utilitarios{
         return dataFormatada;
     }
 
-    formatoEndereco(endereco){
-       
-        let logradouro = endereco.logradouroCep.logradouro;
-        let numero = endereco.numero.numero;
-        let complemento = endereco.logradouroCep.complemento;
-        if(complemento){
-            complemento = complemento.complemento;
-        }
-        let bairro = endereco.logradouroCep.bairro.nome;
-        let cidade = endereco.logradouroCep.bairro.cidade.nome;
-        let estado = endereco.logradouroCep.bairro.cidade.estado.nome;
-        let cep = endereco.logradouroCep.cep;
-
-        let enderecoCompleto = `${logradouro} ${numero} ${(complemento) != null ? complemento: " "}
-        ${bairro} - ${cidade} / ${estado} - CEP: ${cep}`;
-
-        return enderecoCompleto;
-    }
-
-    formatoEstadocivil(estadoCivil){
-        switch(parseInt(estadoCivil)){
-            case 1:
-                return "Solteiro(a)";
-            case 2:
-                return "Casado(a)";
-            case 3:
-                return "Separado(a)";
-            case 4:
-                return "Divorciado(a)";
-            case 5:
-                return "Viúvo(a)";
-            default:
-                return " ";
-        }
-    }
-
     desmascaraCep(cep){
         let partes = cep.split(".");
         partes = `${partes[0]}${partes[1]}`;
@@ -136,6 +100,42 @@ class Utilitarios{
         telefone = `${telefone[0]}${telefone[1]}`;
         telefone = telefone.split("-");
         return `${telefone[0]}${telefone[1]}`;
+    }
+
+    formatoEndereco(endereco){
+       
+        let logradouro = endereco.logradouroCep.logradouro;
+        let numero = endereco.numero.numero;
+        let complemento = endereco.logradouroCep.complemento;
+        if(complemento){
+            complemento = complemento.complemento;
+        }
+        let bairro = endereco.logradouroCep.bairro.nome;
+        let cidade = endereco.logradouroCep.bairro.cidade.nome;
+        let estado = endereco.logradouroCep.bairro.cidade.estado.nome;
+        let cep = endereco.logradouroCep.cep;
+
+        let enderecoCompleto = `${logradouro} ${numero} ${(complemento) != null ? complemento: " "}
+        ${bairro} - ${cidade} / ${estado} - CEP: ${cep}`;
+
+        return enderecoCompleto;
+    }
+
+    formatoEstadocivil(estadoCivil){
+        switch(parseInt(estadoCivil)){
+            case 1:
+                return "Solteiro(a)";
+            case 2:
+                return "Casado(a)";
+            case 3:
+                return "Separado(a)";
+            case 4:
+                return "Divorciado(a)";
+            case 5:
+                return "Viúvo(a)";
+            default:
+                return " ";
+        }
     }
 
 }

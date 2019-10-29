@@ -37,7 +37,7 @@
                 </li>
 
                 <li class="nav-item mr-2" id="inquilino">
-                    <a href="#" class="nav-link">
+                    <a href="inquilino.php" class="nav-link">
                         <i class="fas fa-fw fa-user"></i>
                         <span class="nav-link-text">Inquilino</span>
                     </a>

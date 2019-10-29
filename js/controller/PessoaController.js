@@ -1,15 +1,25 @@
-class ProprietarioController{
+class PessoaController{
 
-    constructor(){
+    static PESSOA_INQUILINO = 1;
+    static PESSOA_PROPRIETARIO = 2;
+
+    constructor(tipoPessoa,repository){
         this.utilitarios = new Utilitarios();
-        this.proprietarioRepository = new ProprietarioRepository();
-        this.tableEl = document.querySelector("#list-of-owners");
-        this.formEl = document.querySelector("#owner-form");
+        this.proprietarioRepository = repository;
+        this.painelLista = "#painel-listar";
+        this.painelCadastro = "#painel-cadastrar";
+        this.painelInformacoes = "#painel-exibir";
+        this.formNome = "#formulario-de-cadastro";
+        this.localDados = "#exibir-dados";
+        this.tableEl = document.querySelector("#lista-de-pessoas");
+        this.formEl = document.querySelector(this.formNome);
+        this.formBuscaEl = document.querySelector("#formulario-de-busca");
         this.contatos = this.formEl.querySelector("#contact-list");
+        this.tipoPessoa = tipoPessoa;
         this.configuracaoNavegacao();
-        this.listarProprietarios();
-        this.buscarProprietariosNome();  
-        this.salvarProprietario();
+        this.listarPessoas();
+        this.buscarPessoaNome();  
+        this.salvarPessoa();
         this.buscarPessoaCpf();
         this.preencherEndereco();
         this.gerenciarContatos();
@@ -36,7 +46,7 @@ class ProprietarioController{
             btn.addEventListener("click",event => {
                 event.preventDefault();
                 this.resetarFormulario();
-                this.listarProprietarios();
+                this.listarPessoas();
                 this.alternarPaineis(4);
                 this.alternarPaineis(6);
                 this.alternarPaineis(1);
@@ -49,22 +59,22 @@ class ProprietarioController{
 
         switch(opcao){
             case 1:
-                $("#painel-lista-proprietarios").show('fade'); 
+                $(this.painelLista).show('fade'); 
                 break;
             case 2:
-                $("#painel-lista-proprietarios").hide('fade');
+                $(this.painelLista).hide('fade');
                 break;
             case 3:
-                $("#painel-cadastro-proprietario").show('fade');
+                $(this.painelCadastro).show('fade');
                 break;
             case 4:
-                $("#painel-cadastro-proprietario").hide('fade');
+                $(this.painelCadastro).hide('fade');
                 break;
             case 5:
-                $("#painel-informacoes-proprietarios").show('fade');
+                $(this.painelInformacoes).show('fade');
                 break;
             case 6:
-                $("#painel-informacoes-proprietarios").hide('fade');
+                $(this.painelInformacoes).hide('fade');
                 break;
         }
 
@@ -79,20 +89,21 @@ class ProprietarioController{
         this.formEl.reset();
     }
 
-    listarProprietarios(){
+    listarPessoas(){
 
-        let props = this.gerenciarLocalStore(2);
+        let pessoas = this.gerenciarSessionStore(2);
 
-        let chamarPaginacao = proprietarios => {
-            this.gerenciarPaginacao(proprietarios);
+        let paginacao = pessoas => {
+            this.gerenciarPaginacao(pessoas);
         };
 
-        if(!props){
+        if(!pessoas){
 
+            //Verificar a quem se destina
             this.proprietarioRepository.getProprietarios(
                 proprietarios => {
-                    this.gerenciarLocalStore(1,proprietarios);
-                    chamarPaginacao(proprietarios);
+                    this.gerenciarSessionStore(1,proprietarios);
+                    paginacao(proprietarios);
                 },
                 erro => {
                     console.log(erro);
@@ -100,138 +111,134 @@ class ProprietarioController{
             );
 
         }else{
-            chamarPaginacao(props);
+            paginacao(pessoas);
         }
 
     }
 
-    gerenciarLocalStore(opcao,proprietario = null){
+    gerenciarSessionStore(opcao,pess = null){
 
-        let retorno;
+        //Subi / Por enquanto
+            let nomeAttr = "proprietarios";
+        //
 
-        let proprietarios;
+        let pessoas;
 
         switch(opcao){
             case 1://Colocar
-                localStorage.setItem("proprietarios",JSON.stringify(proprietario));
+                sessionStorage.setItem(nomeAttr,JSON.stringify(pess));
             break;
             case 2: //Pegar
-                retorno = localStorage.getItem("proprietarios");
-                if(retorno){
-                    retorno = JSON.parse(retorno);
+                pessoas = sessionStorage.getItem(nomeAttr);
+                if(pessoas){
+                    pessoas = JSON.parse(pessoas);
                 }
             break;
-            case 3: //Atualizar
-                proprietarios = this.gerenciarLocalStore(2);
+            case 3: //Atualizar - Inserir
+                pessoas = this.gerenciarSessionStore(2);
 
                 let achou = false;
-                proprietarios.forEach((prop,index) => {
-                    if(prop.idPessoa == proprietario.idPessoa){
-                        proprietarios[index] = proprietario;
+                pessoas.forEach((pessoa,index) => {
+                    if(pessoa.idPessoa == pess.idPessoa){
+                        pessoas[index] = pess;
                         achou = true;
                     }
                 });
 
                 if(!achou){
-                    proprietarios.push(proprietario);
+                    pessoas.push(pess);
                 }
 
-                this.gerenciarLocalStore(1,proprietarios);
+                this.gerenciarSessionStore(1,pessoas);
             break;
             case 4: //Excluir
-                proprietarios = this.gerenciarLocalStore(2);
+                pessoas = this.gerenciarSessionStore(2);
 
-                let propsNovo = [];
+                let pessoasFiltradas = [];
         
-                proprietarios.forEach(prop => {
-                    if(prop.idPessoa != proprietario.idPessoa){
-                        propsNovo.push(prop);
+                pessoas.forEach(pessoa => {
+                    if(pessoa.idPessoa != pess.idPessoa){
+                        pessoasFiltradas.push(pessoa);
                     }
                 });
         
-                this.gerenciarLocalStore(1,propsNovo);
+                this.gerenciarSessionStore(1,pessoasFiltradas);
             break;
         }
 
-        return retorno;
+        return pessoas;
     }
 
-    gerenciarPaginacao(proprietarios){
+    gerenciarPaginacao(dados){
 
-        if(proprietarios){
+        if(dados){
 
-            let selectPaginacao = document.querySelector("#qtdRegistros");
+            let cbQtdRegistros = document.querySelector("#qtdRegistros");
 
-            selectPaginacao.addEventListener("change",event=> { 
+            cbQtdRegistros.addEventListener("change",event=> { 
                 
                 let qtdRegistros = parseInt(event.target.value);
-                let qtdProprietarios = proprietarios.length;
-                let qtdExibida = parseInt(qtdProprietarios/qtdRegistros);
-                let sobraDivisao = parseInt(qtdProprietarios % qtdRegistros);
-                if(sobraDivisao > 0){
-                    qtdExibida++;
+                let qtdDados = dados.length;
+                let qtdPaginas = parseInt(qtdDados/qtdRegistros);
+                let sobra = parseInt(qtdDados % qtdRegistros);
+                if(sobra > 0){
+                    qtdPaginas++;
                 }
 
-                let divPaginacao = document.querySelector(".paging-system");
-
-                let lis = divPaginacao.querySelectorAll("li");
+                let ulPaginacao = document.querySelector(".paging-system");
+                let lis = ulPaginacao.querySelectorAll("li")
                 lis.forEach(li => {
-                    divPaginacao.removeChild(li);
+                    ulPaginacao.removeChild(li);
                 });
 
-                for(let i=0; i < qtdExibida; i++){
+                for(let i=0; i < qtdPaginas; i++){
 
                     let li = document.createElement("li");
                     li.classList.add("page-item");
 
                     let de = i*qtdRegistros;
                     let ate = (de + qtdRegistros) - 1;
-                    if(ate > qtdProprietarios){
-                        ate = qtdProprietarios - 1;
+                    if(ate > qtdDados){
+                        ate = qtdDados - 1;
                     }
 
                     let link = `<a href="#" class="page-link btn-pagina" data-de="${de}" data-ate="${ate}">${i+1}</a>`;
 
                     li.innerHTML = link;
 
-                    divPaginacao.appendChild(li);
+                    ulPaginacao.appendChild(li);
 
                 }
 
-                let linksPagina = document.querySelectorAll(".btn-pagina");
-                
-                linksPagina.forEach(linkPagina => {
+                let linksPaginas = ulPaginacao.querySelectorAll(".btn-pagina");
+                linksPaginas.forEach(linkPagina => {
 
                     linkPagina.addEventListener("click",event => {
                         event.preventDefault();
 
-                        let lis = divPaginacao.querySelectorAll("li");
+                        let lis = ulPaginacao.querySelectorAll("li");
                         lis.forEach(li => {
                             li.classList.remove("active");
                         });
                         event.target.parentElement.classList.add("active");
 
-                        let comeco = parseInt(linkPagina.dataset.de);
-                        let fim = parseInt(linkPagina.dataset.ate);
+                        let indexInicio = parseInt(linkPagina.dataset.de);
+                        let indexFinal = parseInt(linkPagina.dataset.ate);
 
                         this.removerLinhas();
-                        for(let i = comeco; i <= fim; i++){
-                            this.addLinha(proprietarios[i]);
+                        for(let i = indexInicio; i <= indexFinal; i++){
+                            this.addLinha(dados[i]);
                         }
 
                     });
 
                 });
 
-                $(function () {
-                    $('[data-toggle="tooltip"]').tooltip();
-                });
-
-                linksPagina[0].dispatchEvent(new Event("click"));
+                linksPaginas[0].dispatchEvent(new Event("click"));
 
             });
 
-            selectPaginacao.dispatchEvent(new Event("change"));
+            cbQtdRegistros.dispatchEvent(new Event("change"));
         }else{
             this.removerLinhas();
         }
@@ -244,15 +251,15 @@ class ProprietarioController{
         });
     }
 
-    addLinha(proprietario){
+    addLinha(pessoa){
 
-        if(!proprietario) return null;
+        if(!pessoa) return null;
         
         let tr = document.createElement("tr");
 
         let celular;
         let telefone = null;
-        proprietario.contatos.forEach(contato => {
+        pessoa.contatos.forEach(contato => {
             if(contato.tipoContato == 2){
                 celular = contato.numero;
             }else if(contato.tipoContato == 1){
@@ -261,28 +268,32 @@ class ProprietarioController{
         });
 
         tr.innerHTML = `
-            <td>${proprietario.idPessoa}</td>
-            <td>${this.utilitarios.mascaraCPF(proprietario.cpf)}</td>
-            <td>${proprietario.nome}</td>
+            <td>${pessoa.idPessoa}</td>
+            <td>${this.utilitarios.mascaraCPF(pessoa.cpf)}</td>
+            <td>${pessoa.nome}</td>
             <td>${this.utilitarios.mascaraCelular(celular)}</td>
             <td>${(telefone) == null ? "-" : this.utilitarios.mascaraTelefone(telefone)}</td>
-            <td>${proprietario.email}</td>
+            <td>${pessoa.email}</td>
             <td>
-                <a href="#" class="btn btn-primary btn-sm mr-1 btn-editar" data-toggle="tooltip" data-placement="top" title="Alterar dados do Proprietário">
+                <a href="#" class="btn btn-primary btn-sm mr-1 btn-editar" data-toggle="tooltip" data-placement="top" title="Alterar dados">
                     <i class="fas fa-edit"></i>
                 </a>
-                <a href="#" class="btn btn-primary btn-sm mr-1 btn-informacoes" data-toggle="tooltip" title="Visualizar dados do Proprietário">
+                <a href="#" class="btn btn-primary btn-sm mr-1 btn-informacoes" data-toggle="tooltip" title="Visualizar dados">
                     <i class="fas fa-eye"></i>
                 </a>
-                <button type="button" class="btn btn-danger btn-sm btn-excluir" data-toggle="tooltip" title="Excluir Proprietário">
+                <button type="button" class="btn btn-danger btn-sm btn-excluir" data-toggle="tooltip" title="Excluir">
                     <i class="fa fa-trash-alt"></i>
                 </button>
             </td>
         `;
 
-        tr.dataset.proprietario = JSON.stringify(proprietario);
+        tr.dataset.pessoa = JSON.stringify(pessoa);
 
         this.tableEl.appendChild(tr);
+
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip();
+        });
 
         this.addEventsBtns(tr);
 
@@ -290,47 +301,45 @@ class ProprietarioController{
 
     addEventsBtns(tr){
 
-        let proprietario = tr.dataset.proprietario;
+        let pessoa = JSON.parse(tr.dataset.pessoa);
 
         //btn-informações
         let btnInformacoes = tr.querySelector(".btn-informacoes");
-        this.eventBtnInformacoes(btnInformacoes,proprietario);
+        this.eventBtnInformacoes(btnInformacoes,pessoa);
 
         //btn-editar
         let btnEditar = tr.querySelector(".btn-editar");
-        this.eventBtnEditar(btnEditar,proprietario);
+        this.eventBtnEditar(btnEditar,pessoa);
         
 
         //btn-excluir
         let btnExcluir = tr.querySelector(".btn-excluir");
-        this.eventBtnExcluir(btnExcluir,proprietario);
+        this.eventBtnExcluir(btnExcluir,pessoa);
         
     }
 
-    eventBtnInformacoes(btn,informacoes){
+    eventBtnInformacoes(btn,pessoa){
         btn.addEventListener("click",event => {
             event.preventDefault();
 
             this.alternarPaineis(2);
             this.alternarPaineis(5);
 
-            let proprietario = JSON.parse(informacoes);
-
-            for(let attr in proprietario){
-                let elemento = document.querySelector(`#datas-owner #${attr}`);
+            for(let attr in pessoa){
+                let elemento = document.querySelector(`${this.localDados} #${attr}`);
                 if(elemento){
                     if(attr == "dataNascimento" || attr == "dataExpedicao"){
-                        proprietario[attr] = this.utilitarios.formatarData(proprietario[attr]);
+                        pessoa[attr] = this.utilitarios.formatarData(pessoa[attr]);
                     }else if(attr == "cpf"){
-                        proprietario[attr] = this.utilitarios.mascaraCPF(proprietario[attr]);
+                        pessoa[attr] = this.utilitarios.mascaraCPF(pessoa[attr]);
                     }else if(attr == "endereco"){
-                        proprietario[attr] = this.utilitarios.formatoEndereco(proprietario[attr]);
+                        pessoa[attr] = this.utilitarios.formatoEndereco(pessoa[attr]);
                     }else if(attr == "estadoCivil"){
-                        proprietario[attr] = this.utilitarios.formatoEstadocivil(proprietario[attr]);
+                        pessoa[attr] = this.utilitarios.formatoEstadocivil(pessoa[attr]);
                     }
 
                     if(attr != "contatos"){
-                        elemento.innerHTML = proprietario[attr];
+                        elemento.innerHTML = pessoa[attr];
                     }else{
 
                         let divs = elemento.querySelectorAll(".contato");
@@ -338,7 +347,7 @@ class ProprietarioController{
                             elemento.removeChild(d);
                         });
 
-                        proprietario[attr].forEach(contato => {
+                        pessoa[attr].forEach(contato => {
                             let div = document.createElement("div");
                             div.className = "contato";
                             
@@ -362,11 +371,11 @@ class ProprietarioController{
         
     }
 
-    eventBtnEditar(btn,proprietario){
+    eventBtnEditar(btn,pessoa){
         btn.addEventListener("click",event => {
             event.preventDefault();
 
-            this.setValoresFormulario(JSON.parse(proprietario));
+            this.setValoresFormulario(pessoa);
  
             this.alternarPaineis(2);
             this.alternarPaineis(3);
@@ -374,11 +383,11 @@ class ProprietarioController{
         });
     }
 
-    setValoresFormulario(proprietario){
+    setValoresFormulario(pessoa){
         let campos = this.formEl.querySelectorAll("[name]");
         
         campos.forEach(campo => {
-            let valor =  proprietario[campo.name];
+            let valor =  pessoa[campo.name];
             if(valor){
                 if(campo.name == "cpf"){
                     campo.value = this.utilitarios.mascaraCPF(valor);
@@ -387,24 +396,24 @@ class ProprietarioController{
                 }
             }
             if(campo.name == "cep"){
-                campo.value = this.utilitarios.mascaraCep(proprietario.endereco.logradouroCep.cep);
+                campo.value = this.utilitarios.mascaraCep(pessoa.endereco.logradouroCep.cep);
             }
         });
 
         //endereço
-        let complemento = proprietario.endereco.logradouroCep.complemento;
+        let complemento = pessoa.endereco.logradouroCep.complemento;
         if(!complemento){
             complemento = "";
         }else{
             complemento = complemento.complemento;
         }
         let endereco = {
-            logradouro: proprietario.endereco.logradouroCep.logradouro,
-            numeroEnd: proprietario.endereco.numero.numero,
+            logradouro: pessoa.endereco.logradouroCep.logradouro,
+            numeroEnd: pessoa.endereco.numero.numero,
             complemento: complemento,
-            bairro: proprietario.endereco.logradouroCep.bairro.nome,
-            localidade: proprietario.endereco.logradouroCep.bairro.cidade.nome,
-            uf: proprietario.endereco.logradouroCep.bairro.cidade.estado.nome
+            bairro: pessoa.endereco.logradouroCep.bairro.nome,
+            localidade: pessoa.endereco.logradouroCep.bairro.cidade.nome,
+            uf: pessoa.endereco.logradouroCep.bairro.cidade.estado.nome
         }
         this.setValoresFormularioEndereco(endereco);
 
@@ -413,7 +422,7 @@ class ProprietarioController{
         for(let i=1; i < conts.length; i++){
             this.contatos.removeChild(conts[i]);
         }
-        for(let i=1; i < proprietario.contatos.length; i++){
+        for(let i=1; i < pessoa.contatos.length; i++){
             this.addCampoNumero();
         }
 
@@ -421,11 +430,11 @@ class ProprietarioController{
         for(let i=0; i < conts.length; i++){
             let divContato = conts[i];
 
-            divContato.querySelector("[name=idContato]").value = proprietario.contatos[i].idContato;
+            divContato.querySelector("[name=idContato]").value = pessoa.contatos[i].idContato;
            
             
-            let numero = proprietario.contatos[i].numero;
-            let tipoContato = proprietario.contatos[i].tipoContato;
+            let numero = pessoa.contatos[i].numero;
+            let tipoContato = pessoa.contatos[i].tipoContato;
             if(tipoContato == 1){
                 numero = this.utilitarios.mascaraTelefone(numero);
             }else if(tipoContato == 2){
@@ -498,7 +507,7 @@ class ProprietarioController{
         this.gerenciarMascaraContato(contato);
     }
 
-    eventBtnExcluir(btn,proprietario){
+    eventBtnExcluir(btn,pessoa){
         btn.addEventListener("click", event => {
             event.preventDefault();
 
@@ -507,12 +516,12 @@ class ProprietarioController{
             this.controleModal(3,event => {
                 event.preventDefault();
 
-                this.proprietarioRepository.excluirProprietario(proprietario,
+                this.proprietarioRepository.excluirProprietario(JSON.stringify(pessoa),
                     data => {
                         this.controleModal(2);
                         this.exibirMsgSucesso(2);
-                        this.gerenciarLocalStore(4,JSON.parse(proprietario));
-                        this.listarProprietarios();
+                        this.gerenciarSessionStore(4,pessoa);
+                        this.listarPessoas();
                     },
                     error => {
                         this.controleModal(2);
@@ -579,13 +588,11 @@ class ProprietarioController{
 
     }
 
-    buscarProprietariosNome(){
+    buscarPessoaNome(){
 
-        let formBuscar = document.querySelector("#search-owner");
-        formBuscar.addEventListener("submit",event => {
-            event.preventDefault();
-            
-            let nome = event.target.querySelector("#field-search-name").value;
+        let campoTexto = document.querySelector("#field-search-name");
+
+        let reacaoEvento = (nome) => {
 
             this.proprietarioRepository.getProprietariosNome(nome,
                 proprietarios => {
@@ -597,38 +604,39 @@ class ProprietarioController{
                 }
             );
 
+        }
+
+        this.formBuscaEl.addEventListener("submit",event => {
+            event.preventDefault();
+            
+            reacaoEvento(campoTexto.value);
+            
         });
 
-        let campoTexto = document.querySelector("#field-search-name");
+        
         campoTexto.addEventListener("keyup",event => { 
-            this.proprietarioRepository.getProprietariosNome(event.target.value,
-                proprietarios => { 
-                    this.gerenciarPaginacao(proprietarios); 
-                },
-                error => {
-                    this.gerenciarPaginacao(null);
-                    console.log(error);
-                }
-            );
+            
+            reacaoEvento(event.target.value);
+
         });
 
     }
 
-    salvarProprietario(){
+    salvarPessoa(){
 
         this.formEl.addEventListener("submit",event => {
             event.preventDefault();
             
-            let proprietario = this.getValoresFormulario();
+            let pessoa = this.getValoresFormulario();
 
-            if(!proprietario) return null;
+            if(!pessoa) return null;
 
-            let stringProprietario = JSON.stringify(proprietario);
+            let stringPessoa = JSON.stringify(pessoa);
 
             let sucesso  = (data) => {
                 this.exibirMsgSucesso(1);
                 this.resetarFormulario();
-                this.gerenciarLocalStore(3,data);
+                this.gerenciarSessionStore(3,data);
             }
 
             let erro = (error) => {
@@ -636,9 +644,9 @@ class ProprietarioController{
                 this.exibirMsgErro(1);
             }
 
-            if(proprietario.idPessoa){//Atualizar
+            if(pessoa.idPessoa){//Atualizar
 
-                this.proprietarioRepository.atualizarProprietario(stringProprietario,
+                this.proprietarioRepository.atualizarProprietario(stringPessoa,
                     data => {
                         sucesso(data);
                     },
@@ -649,7 +657,7 @@ class ProprietarioController{
 
             }else{//Cadastrar
                 
-                this.proprietarioRepository.cadastrarProprietario(stringProprietario,
+                this.proprietarioRepository.cadastrarProprietario(stringPessoa,
                     data => {
                         sucesso(data);
                     },
@@ -736,15 +744,17 @@ class ProprietarioController{
 
             });
 
-            let proprietario = {};
-            proprietario.tipoPessoa = 2;
+            let pessoa = {};
+            pessoa.tipoPessoa = this.tipoPessoa;
             for(let attr in dadosPessoais){
-                proprietario[attr] = dadosPessoais[attr];
+                pessoa[attr] = dadosPessoais[attr];
             }
-            proprietario.salario = null;
-            proprietario.ativo = true;
-            proprietario.contatos = dadosContatos;
-            proprietario.endereco = {
+            if(!pessoa.salario){
+                pessoa.salario = null;
+            }
+            pessoa.ativo = true;
+            pessoa.contatos = dadosContatos;
+            pessoa.endereco = {
                 logradouroCep: {
                     logradouro: dadosEndereco.logradouro,
                     cep: dadosEndereco.cep,
@@ -763,14 +773,14 @@ class ProprietarioController{
                 }
             }
             if(dadosEndereco.complemento){
-                proprietario.endereco.logradouroCep.complemento = {
+                pessoa.endereco.logradouroCep.complemento = {
                     complemento: dadosEndereco.complemento
                 }
             }else{
-                proprietario.endereco.logradouroCep.complemento = null;
+                pessoa.endereco.logradouroCep.complemento = null;
             }
             
-            return proprietario;
+            return pessoa;
         }else{
             return null;
         }
@@ -804,7 +814,7 @@ class ProprietarioController{
     }
 
     buscarPessoaCpf(){
-        $("#owner-form #cpf").mask("000.000.000-00");
+        $(`${this.formNome} #cpf`).mask("000.000.000-00");
 
         this.formEl.querySelector("#cpf").addEventListener("blur",event => {
 
@@ -825,7 +835,7 @@ class ProprietarioController{
 
     preencherEndereco(){
 
-        $("#owner-form #cep").mask("00.000-000");
+        $(`${this.formNome} #cep`).mask("00.000-000");
         
         this.formEl.querySelector("#cep").addEventListener("blur",event => {
 
