@@ -495,6 +495,7 @@
         include_once("scripts.php");
     ?>
 
+    <script src="js/repository/PessoaRepository.js"></script>
     <script src="js/repository/ProprietarioRepository.js"></script>
     <script src="js/controller/PessoaController.js"></script>
     <script src="js/indexProprietario.js"></script>

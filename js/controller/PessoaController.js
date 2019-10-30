@@ -5,7 +5,7 @@ class PessoaController{
 
     constructor(tipoPessoa,repository){
         this.utilitarios = new Utilitarios();
-        this.proprietarioRepository = repository;
+        this.pessoaRepository = repository;
         this.painelLista = "#painel-listar";
         this.painelCadastro = "#painel-cadastrar";
         this.painelInformacoes = "#painel-exibir";
@@ -99,14 +99,13 @@ class PessoaController{
 
         if(!pessoas){
 
-            //Verificar a quem se destina
-            this.proprietarioRepository.getProprietarios(
-                proprietarios => {
-                    this.gerenciarSessionStore(1,proprietarios);
-                    paginacao(proprietarios);
+            this.pessoaRepository.buscarTodos(
+                pessoas => {
+                    this.gerenciarSessionStore(1,pessoas);
+                    paginacao(pessoas);
                 },
-                erro => {
-                    console.log(erro);
+                error => {
+                    console.log(error);
                 }
             );
 
@@ -118,9 +117,12 @@ class PessoaController{
 
     gerenciarSessionStore(opcao,pess = null){
 
-        //Subi / Por enquanto
-            let nomeAttr = "proprietarios";
-        //
+        let nomeAttr;
+        if(this.tipoPessoa == PessoaController.PESSOA_PROPRIETARIO){
+            nomeAttr = "proprietarios";
+        }else if(this.tipoPessoa == PessoaController.PESSOA_INQUILINO){
+            nomeAttr = "inquilinos";
+        }
 
         let pessoas;
 
@@ -516,7 +518,7 @@ class PessoaController{
             this.controleModal(3,event => {
                 event.preventDefault();
 
-                this.proprietarioRepository.excluirProprietario(JSON.stringify(pessoa),
+                this.pessoaRepository.excluir(JSON.stringify(pessoa),
                     data => {
                         this.controleModal(2);
                         this.exibirMsgSucesso(2);
@@ -529,6 +531,7 @@ class PessoaController{
                         console.log(error);
                     }
                 );
+
             });
 
         });
@@ -594,9 +597,9 @@ class PessoaController{
 
         let reacaoEvento = (nome) => {
 
-            this.proprietarioRepository.getProprietariosNome(nome,
-                proprietarios => {
-                    this.gerenciarPaginacao(proprietarios);
+            this.pessoaRepository.buscarPorNome(nome,
+                pessoas => {
+                    this.gerenciarPaginacao(pessoas);
                 },
                 error => {
                     this.gerenciarPaginacao(null);
@@ -608,16 +611,11 @@ class PessoaController{
 
         this.formBuscaEl.addEventListener("submit",event => {
             event.preventDefault();
-            
-            reacaoEvento(campoTexto.value);
-            
+            reacaoEvento(campoTexto.value); 
         });
-
         
         campoTexto.addEventListener("keyup",event => { 
-            
             reacaoEvento(event.target.value);
-
         });
 
     }
@@ -646,7 +644,7 @@ class PessoaController{
 
             if(pessoa.idPessoa){//Atualizar
 
-                this.proprietarioRepository.atualizarProprietario(stringPessoa,
+                this.pessoaRepository.alterar(stringPessoa,
                     data => {
                         sucesso(data);
                     },
@@ -657,7 +655,7 @@ class PessoaController{
 
             }else{//Cadastrar
                 
-                this.proprietarioRepository.cadastrarProprietario(stringPessoa,
+                this.pessoaRepository.cadastrar(stringPessoa,
                     data => {
                         sucesso(data);
                     },
@@ -820,7 +818,7 @@ class PessoaController{
 
             let cpf = this.utilitarios.desmascaraCpf(event.target.value);
 
-            this.proprietarioRepository.getPessoaCpf(cpf,
+            this.pessoaRepository.buscarPorCPF(cpf,
                 pessoa => {
                     this.setValoresFormulario(pessoa);
                 },
@@ -841,7 +839,7 @@ class PessoaController{
 
             let cep = this.utilitarios.desmascaraCep(event.target.value);
 
-            this.proprietarioRepository.getEnderecoCep(cep,
+            this.pessoaRepository.buscarEnderecoPorCEP(cep,
                 endereco => {
                     this.setValoresFormularioEndereco(endereco);
                 },

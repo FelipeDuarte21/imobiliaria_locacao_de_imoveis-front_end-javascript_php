@@ -7,7 +7,7 @@
     <div class="container-fluid">
 
         <!--Mosta os Inquilinos, painel principal-->
-        <div id="painel-lista-inquilinos">   
+        <div id="painel-listar">   
             <div class="row justify-content-center">
 
                 <div class="col-xl-12">
@@ -19,6 +19,40 @@
                             <i class="fas fa-user-plus mr-1"></i>Novo
                         </a>
 
+                    </div>
+
+                    <div class="alert alert-success mt-3 collapse" id="alert-sucesso-excluir">
+                        <strong>Sucesso!</strong> inquilino excluído com sucesso!
+                        <button type="button" class="close" id="btn-alert-sucesso-excluir">&times;</button>
+                    </div>
+    
+                    <div class="alert alert-danger mt-3 collapse" id="alert-erro-excluir">
+                        <strong>Erro!</strong> erro ao excluir inquilino!
+                        <button type="button" class="close" id="btn-alert-erro-excluir">&times;</button>
+                    </div>
+
+                    <div class="modal fade" id="modalExcluir" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <p class="font-weight-bold">Confirmação</p>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Deseja realmente excluir esse inquilino?</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-primary sim-excluir">
+                                        <i class="far fa-check-circle mr-1"></i>Sim
+                                    </button>
+                                    <button type="button" class="btn btn-danger" data-dismiss="modal" aria-label="Não">
+                                        <i class="fas fa-times-circle mr-1"></i>Não
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="mt-3 mb-4">
@@ -36,7 +70,7 @@
                                     <div class="col-6">
                                 
                                         <div class="form-inline">
-                                            <form id="search-renter">
+                                            <form id="formulario-de-busca">
                                                 <input type="text" id="field-search-name" class="form-control form-control-sm" placeholder="Pesquisar por nome...">
 
                                                 <button type="submit" class="btn btn-primary btn-sm">
@@ -78,7 +112,7 @@
                                             </tr>
                                         </thead>
                                         
-                                        <tbody class="text-center" id="list-of-renters">
+                                        <tbody class="text-center" id="lista-de-pessoas">
                                             <!--Lista de Inquilinos--> 
                                         </tbody>
                                         
@@ -96,11 +130,15 @@
                                     </table>
                                 </div>
 
-                            </div>
+                                <div>
+            
+                                    <ul class="pagination float-right mt-2 paging-system">
+                                        <!--Paginação-->
+                                    </ul>
+            
+                                </div>
 
-                            <ul class="pagination float-right mt-1 paging-system">
-                                <!--Paginação-->
-                            </ul>
+                            </div>
 
                         </div>
 
@@ -112,7 +150,7 @@
         </div>
 
         <!--Painel de formulário de cadastro de inquilino-->
-        <div id="painel-cadastro-inquilino">
+        <div id="painel-cadastrar">
             <div class="row justify-content-center mb-3">
 
                 <div class="col-xl-12">
@@ -135,7 +173,7 @@
                         
                             <div class="card-body">
                                                 
-                                <form id="renter-form">
+                                <form id="formulario-de-cadastro">
                                         
                                     <div class="row justify-content-center mt-3">
                                         <div class="col-xl-9">
@@ -289,7 +327,7 @@
                                                 </div>
                                 
                                                 <div id="contact-list" class="mt-2">
-                                                    <div class="form-row fields-contact">
+                                                    <div class="form-row field-contact">
 
                                                         <input type="hidden" name="idContato" value="0">
 
@@ -329,13 +367,28 @@
 
                     </div>
 
+                    <div class="alert alert-success mt-3 collapse" id="alert-sucesso">
+                        <strong>Sucesso!</strong> inquilino salvo/atualizado com sucesso!
+                        <button type="button" class="close" id="btn-alert-sucesso">&times;</button>
+                    </div>
+
+                    <div class="alert alert-danger mt-3 collapse" id="alert-erro">
+                        <strong>Erro!</strong> erro ao salvar/atualizar inquilino!
+                        <button type="button" class="close" id="btn-alert-erro">&times;</button>
+                    </div>
+
+                    <div class="alert alert-warning mt-3 collapse" id="alert-aviso">
+                        <strong>Aviso!</strong> Campos vazios, por favor, preencha os campos obrigatórios!
+                        <button type="button" class="close" id="btn-alert-aviso">&times;</button>
+                    </div>
+
                 </div>
 
             </div>
         </div>
 
         <!--Painel com as informações do Inquilino-->
-        <div id="painel-informacoes-inquilino">
+        <div id="painel-exibir">
             <div class="row justify-content-center">
 
                 <div class="col-xl-12">
@@ -358,7 +411,7 @@
                                             
                             <div class="card-body">
 
-                                <div class="row" id="datas-renter">
+                                <div class="row" id="exibir-dados">
 
                                     <div class="col-xl-8">
 
@@ -418,8 +471,8 @@
                                                 <span id="email">-</span>
 
                                                 <h6 class="mt-2 mb-0">Número de Telefone/Celular</h6>
-                                                <div id="datas-contacts">
-                                                    <div class="datas-contact">-</div>
+                                                <div id="contatos">
+                                                    <div class="contato">-</div>
                                                 </div>
                                             </div>
                                         
@@ -447,8 +500,9 @@
         include_once("scripts.php");
     ?>
 
+    <script src="js/repository/PessoaRepository.js"></script>
     <script src="js/repository/InquilinoRepository.js"></script>
-    <script src="js/controller/InquilinoController.js"></script>
+    <script src="js/controller/PessoaController.js"></script>
     <script src="js/indexInquilino.js"></script>
 </body>
 </html>
