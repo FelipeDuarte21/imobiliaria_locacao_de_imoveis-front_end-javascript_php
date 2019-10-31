@@ -1,10 +1,15 @@
-class PessoaController{
+class PessoaController extends BaseController{
 
-    static PESSOA_INQUILINO = 1;
-    static PESSOA_PROPRIETARIO = 2;
+    static PESSOA_INQUILINO(){
+        return 1;
+    }
+
+    static PESSOA_PROPRIETARIO(){
+        return 2;
+    }
 
     constructor(tipoPessoa,repository){
-        this.utilitarios = new Utilitarios();
+        super();
         this.pessoaRepository = repository;
         this.painelLista = "#painel-listar";
         this.painelCadastro = "#painel-cadastrar";
@@ -16,6 +21,7 @@ class PessoaController{
         this.formBuscaEl = document.querySelector("#formulario-de-busca");
         this.contatos = this.formEl.querySelector("#contact-list");
         this.tipoPessoa = tipoPessoa;
+        this.nomeTipoPessoa = (this.tipoPessoa == PessoaController.PESSOA_PROPRIETARIO()) ? "proprietarios" : "inquilinos" ;
         this.configuracaoNavegacao();
         this.listarPessoas();
         this.buscarPessoaNome();  
@@ -91,17 +97,17 @@ class PessoaController{
 
     listarPessoas(){
 
-        let pessoas = this.gerenciarSessionStore(2);
+        let pessoas = super.gerenciarSessionStore(2,this.nomeTipoPessoa);
 
         let paginacao = pessoas => {
-            this.gerenciarPaginacao(pessoas);
+            super.gerenciarPaginacao(pessoas,this.removerLinhas,this.addLinha);
         };
 
         if(!pessoas){
 
             this.pessoaRepository.buscarTodos(
                 pessoas => {
-                    this.gerenciarSessionStore(1,pessoas);
+                    super.gerenciarSessionStore(1,this.nomeTipoPessoa,pessoas);
                     paginacao(pessoas);
                 },
                 error => {
@@ -115,145 +121,14 @@ class PessoaController{
 
     }
 
-    gerenciarSessionStore(opcao,pess = null){
-
-        let nomeAttr;
-        if(this.tipoPessoa == PessoaController.PESSOA_PROPRIETARIO){
-            nomeAttr = "proprietarios";
-        }else if(this.tipoPessoa == PessoaController.PESSOA_INQUILINO){
-            nomeAttr = "inquilinos";
-        }
-
-        let pessoas;
-
-        switch(opcao){
-            case 1://Colocar
-                sessionStorage.setItem(nomeAttr,JSON.stringify(pess));
-            break;
-            case 2: //Pegar
-                pessoas = sessionStorage.getItem(nomeAttr);
-                if(pessoas){
-                    pessoas = JSON.parse(pessoas);
-                }
-            break;
-            case 3: //Atualizar - Inserir
-                pessoas = this.gerenciarSessionStore(2);
-
-                let achou = false;
-                pessoas.forEach((pessoa,index) => {
-                    if(pessoa.idPessoa == pess.idPessoa){
-                        pessoas[index] = pess;
-                        achou = true;
-                    }
-                });
-
-                if(!achou){
-                    pessoas.push(pess);
-                }
-
-                this.gerenciarSessionStore(1,pessoas);
-            break;
-            case 4: //Excluir
-                pessoas = this.gerenciarSessionStore(2);
-
-                let pessoasFiltradas = [];
-        
-                pessoas.forEach(pessoa => {
-                    if(pessoa.idPessoa != pess.idPessoa){
-                        pessoasFiltradas.push(pessoa);
-                    }
-                });
-        
-                this.gerenciarSessionStore(1,pessoasFiltradas);
-            break;
-        }
-
-        return pessoas;
-    }
-
-    gerenciarPaginacao(dados){
-
-        if(dados){
-
-            let cbQtdRegistros = document.querySelector("#qtdRegistros");
-
-            cbQtdRegistros.addEventListener("change",event=> { 
-                
-                let qtdRegistros = parseInt(event.target.value);
-                let qtdDados = dados.length;
-                let qtdPaginas = parseInt(qtdDados/qtdRegistros);
-                let sobra = parseInt(qtdDados % qtdRegistros);
-                if(sobra > 0){
-                    qtdPaginas++;
-                }
-
-                let ulPaginacao = document.querySelector(".paging-system");
-                let lis = ulPaginacao.querySelectorAll("li")
-                lis.forEach(li => {
-                    ulPaginacao.removeChild(li);
-                });
-
-                for(let i=0; i < qtdPaginas; i++){
-
-                    let li = document.createElement("li");
-                    li.classList.add("page-item");
-
-                    let de = i*qtdRegistros;
-                    let ate = (de + qtdRegistros) - 1;
-                    if(ate > qtdDados){
-                        ate = qtdDados - 1;
-                    }
-
-                    let link = `<a href="#" class="page-link btn-pagina" data-de="${de}" data-ate="${ate}">${i+1}</a>`;
-
-                    li.innerHTML = link;
-
-                    ulPaginacao.appendChild(li);
-
-                }
-
-                let linksPaginas = ulPaginacao.querySelectorAll(".btn-pagina");
-                linksPaginas.forEach(linkPagina => {
-
-                    linkPagina.addEventListener("click",event => {
-                        event.preventDefault();
-
-                        let lis = ulPaginacao.querySelectorAll("li");
-                        lis.forEach(li => {
-                            li.classList.remove("active");
-                        });
-                        event.target.parentElement.classList.add("active");
-
-                        let indexInicio = parseInt(linkPagina.dataset.de);
-                        let indexFinal = parseInt(linkPagina.dataset.ate);
-
-                        this.removerLinhas();
-                        for(let i = indexInicio; i <= indexFinal; i++){
-                            this.addLinha(dados[i]);
-                        }
-
-                    });
-
-                });
-
-                linksPaginas[0].dispatchEvent(new Event("click"));
-
-            });
-
-            cbQtdRegistros.dispatchEvent(new Event("change"));
-        }else{
-            this.removerLinhas();
-        }
-    }
-
-    removerLinhas(){
+    removerLinhas = () => {
         let trs = this.tableEl.querySelectorAll("tr");
         trs.forEach(tr => {
             this.tableEl.removeChild(tr);
         });
     }
 
-    addLinha(pessoa){
+    addLinha = (pessoa) => {
 
         if(!pessoa) return null;
         
@@ -335,9 +210,11 @@ class PessoaController{
                     }else if(attr == "cpf"){
                         pessoa[attr] = this.utilitarios.mascaraCPF(pessoa[attr]);
                     }else if(attr == "endereco"){
-                        pessoa[attr] = this.utilitarios.formatoEndereco(pessoa[attr]);
+                        pessoa[attr] = super.formatoEndereco(pessoa[attr]);
                     }else if(attr == "estadoCivil"){
-                        pessoa[attr] = this.utilitarios.formatoEstadocivil(pessoa[attr]);
+                        pessoa[attr] = super.formatoEstadocivil(pessoa[attr]);
+                    }else if(attr == "salario"){
+                        pessoa[attr] = this.utilitarios.formatoMoeda(pessoa[attr]);
                     }
 
                     if(attr != "contatos"){
@@ -522,7 +399,7 @@ class PessoaController{
                     data => {
                         this.controleModal(2);
                         this.exibirMsgSucesso(2);
-                        this.gerenciarSessionStore(4,pessoa);
+                        super.gerenciarSessionStore(4,this.nomeTipoPessoa,pessoa,"idPessoa");
                         this.listarPessoas();
                     },
                     error => {
@@ -599,10 +476,10 @@ class PessoaController{
 
             this.pessoaRepository.buscarPorNome(nome,
                 pessoas => {
-                    this.gerenciarPaginacao(pessoas);
+                    super.gerenciarPaginacao(pessoas,this.removerLinhas,this.addLinha);
                 },
                 error => {
-                    this.gerenciarPaginacao(null);
+                    super.gerenciarPaginacao(null,this.removerLinhas,this.addLinha);
                     console.log(error);
                 }
             );
@@ -634,7 +511,7 @@ class PessoaController{
             let sucesso  = (data) => {
                 this.exibirMsgSucesso(1);
                 this.resetarFormulario();
-                this.gerenciarSessionStore(3,data);
+                super.gerenciarSessionStore(3,this.nomeTipoPessoa,data,"idPessoa");
             }
 
             let erro = (error) => {

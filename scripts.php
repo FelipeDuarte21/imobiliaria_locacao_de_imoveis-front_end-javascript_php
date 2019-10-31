@@ -4,3 +4,4 @@
     <script src="js/jquery.mask.min.js"></script>
     <script src="js/Utilitarios.js"></script>
     <script src="js/repository/BaseRepository.js"></script>
+    <script src="js/controller/BaseController.js"></script>
