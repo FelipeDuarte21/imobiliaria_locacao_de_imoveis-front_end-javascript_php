@@ -16,7 +16,7 @@
                 </li>
 
                 <li class="nav-item mr-2" id="imovel">
-                    <a href="#" class="nav-link">
+                    <a href="imovel.php" class="nav-link">
                         <i class="fas fa-fw fa-home"></i>
                         <span class="nav-link-text">Imóvel</span>
                     </a>
@@ -30,7 +30,7 @@
                 </li>
                         
                 <li class="nav-item mr-2" id="locacao">
-                    <a href="#" class="nav-link">
+                    <a href="locacao.php" class="nav-link">
                         <i class="fas fa-fw fa-key"></i>
                         <span class="nav-link-text">Locação</span>
                     </a>

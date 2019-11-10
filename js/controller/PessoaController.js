@@ -21,7 +21,7 @@ class PessoaController extends BaseController{
         this.formBuscaEl = document.querySelector("#formulario-de-busca");
         this.contatos = this.formEl.querySelector("#contact-list");
         this.tipoPessoa = tipoPessoa;
-        this.nomeTipoPessoa = (this.tipoPessoa == PessoaController.PESSOA_PROPRIETARIO()) ? "proprietarios" : "inquilinos" ;
+        this.nomeSession = (this.tipoPessoa == PessoaController.PESSOA_PROPRIETARIO()) ? "proprietários" : "inquilinos" ;
         this.configuracaoNavegacao();
         this.listarPessoas();
         this.buscarPessoaNome();  
@@ -97,7 +97,7 @@ class PessoaController extends BaseController{
 
     listarPessoas(){
 
-        let pessoas = super.gerenciarSessionStore(2,this.nomeTipoPessoa);
+        let pessoas = super.gerenciarSessionStore(2,this.nomeSession);
 
         let paginacao = pessoas => {
             super.gerenciarPaginacao(pessoas,this.removerLinhas,this.addLinha);
@@ -107,7 +107,7 @@ class PessoaController extends BaseController{
 
             this.pessoaRepository.buscarTodos(
                 pessoas => {
-                    super.gerenciarSessionStore(1,this.nomeTipoPessoa,pessoas);
+                    super.gerenciarSessionStore(1,this.nomeSession,pessoas);
                     paginacao(pessoas);
                 },
                 error => {
@@ -399,7 +399,7 @@ class PessoaController extends BaseController{
                     data => {
                         this.controleModal(2);
                         this.exibirMsgSucesso(2);
-                        super.gerenciarSessionStore(4,this.nomeTipoPessoa,pessoa,"idPessoa");
+                        super.gerenciarSessionStore(4,this.nomeSession,pessoa,"idPessoa");
                         this.listarPessoas();
                     },
                     error => {
@@ -511,7 +511,7 @@ class PessoaController extends BaseController{
             let sucesso  = (data) => {
                 this.exibirMsgSucesso(1);
                 this.resetarFormulario();
-                super.gerenciarSessionStore(3,this.nomeTipoPessoa,data,"idPessoa");
+                super.gerenciarSessionStore(3,this.nomeSession,data,"idPessoa");
             }
 
             let erro = (error) => {
