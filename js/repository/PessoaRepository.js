@@ -13,6 +13,10 @@ class PessoaRepository extends BaseRepository{
         super.fazerRequisicao("GET",`${this.URL_PESSOA}/cpf/${cpf}`,null,callbackS,callBackE);
     }
 
+    buscarPorId(id,callbackS,callBackE){
+        super.buscarPorId(`${this.URL_PESSOA}/${id}`,callbackS,callBackE);
+    }
+
     alterar(pessoa,callbackS,callbackE){
         super.alterar(this.URL_PESSOA,pessoa,callbackS,callbackE);
     }

@@ -11,6 +11,8 @@ class LocacaoController extends BaseController{
         this.localDados = "#exibir-dados";
         this.tableEl = document.querySelector("#lista-de-locacoes");
         this.formEl = document.querySelector(this.formNome);
+        this.selectPaginas = document.querySelector("#qtdRegistros");
+        this.ulPaginas = document.querySelector(".paging-system");
         this.nomeSession = "locações";
         this.configuracaoNavegacao();
         this.listarLocacoes();
@@ -97,7 +99,7 @@ class LocacaoController extends BaseController{
         let locacoes = super.gerenciarSessionStore(2,this.nomeSession);
 
         let paginacao = locacoes => {
-            super.gerenciarPaginacao(locacoes,this.removerLinhas,this.addLinha);
+            super.gerenciarPaginacao(locacoes,this.removerLinhas,this.addLinha,this.selectPaginas,this.ulPaginas);
         };
 
         if(!locacoes){

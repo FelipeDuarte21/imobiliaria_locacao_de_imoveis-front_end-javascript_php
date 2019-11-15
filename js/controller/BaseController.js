@@ -89,11 +89,9 @@ class BaseController{
         return dadosRetorno;
     }
 
-    gerenciarPaginacao(dados,removerLinhas,addLinha){
+    gerenciarPaginacao(dados,removerLinhas,addLinha,cbQtdRegistros,ulPaginacao){
 
         if(dados){
-
-            let cbQtdRegistros = document.querySelector("#qtdRegistros");
 
             cbQtdRegistros.addEventListener("change",event=> { 
                 
@@ -105,8 +103,7 @@ class BaseController{
                     qtdPaginas++;
                 }
 
-                let ulPaginacao = document.querySelector(".paging-system");
-                let lis = ulPaginacao.querySelectorAll("li")
+                let lis = ulPaginacao.querySelectorAll("li");
                 lis.forEach(li => {
                     ulPaginacao.removeChild(li);
                 });

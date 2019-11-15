@@ -37,7 +37,11 @@ class BaseRepository{
     }
 
     buscarTodos(url,callbackS,callBackE){
-        this.fazerRequisicao("GET",url,null,callbackS,callBackE)
+        this.fazerRequisicao("GET",url,null,callbackS,callBackE);
+    }
+
+    buscarPorId(url,callbackS,callBackE){
+        this.fazerRequisicao("GET",url,null,callbackS,callBackE);
     }
 
 }

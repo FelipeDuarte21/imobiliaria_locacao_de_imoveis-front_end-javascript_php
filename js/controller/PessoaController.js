@@ -20,6 +20,8 @@ class PessoaController extends BaseController{
         this.formEl = document.querySelector(this.formNome);
         this.formBuscaEl = document.querySelector("#formulario-de-busca");
         this.contatos = this.formEl.querySelector("#contact-list");
+        this.selectPaginas = document.querySelector("#qtdRegistros");
+        this.ulPaginas = document.querySelector(".paging-system");
         this.tipoPessoa = tipoPessoa;
         this.nomeSession = (this.tipoPessoa == PessoaController.PESSOA_PROPRIETARIO()) ? "proprietários" : "inquilinos" ;
         this.configuracaoNavegacao();
@@ -100,7 +102,7 @@ class PessoaController extends BaseController{
         let pessoas = super.gerenciarSessionStore(2,this.nomeSession);
 
         let paginacao = pessoas => {
-            super.gerenciarPaginacao(pessoas,this.removerLinhas,this.addLinha);
+            super.gerenciarPaginacao(pessoas,this.removerLinhas,this.addLinha,this.selectPaginas,this.ulPaginas);
         };
 
         if(!pessoas){
@@ -476,10 +478,10 @@ class PessoaController extends BaseController{
 
             this.pessoaRepository.buscarPorNome(nome,
                 pessoas => {
-                    super.gerenciarPaginacao(pessoas,this.removerLinhas,this.addLinha);
+                    super.gerenciarPaginacao(pessoas,this.removerLinhas,this.addLinha,this.selectPaginas,this.ulPaginas);
                 },
                 error => {
-                    super.gerenciarPaginacao(null,this.removerLinhas,this.addLinha);
+                    super.gerenciarPaginacao(null,this.removerLinhas,this.addLinha,this.selectPaginas,this.ulPaginas);
                     console.log(error);
                 }
             );
