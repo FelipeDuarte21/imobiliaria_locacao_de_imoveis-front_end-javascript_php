@@ -18,10 +18,40 @@
                             <i class="fas fa-plus-square mr-1"></i>Novo
                         </a>
 
-                        <a href="#" class="btn btn-info btn-prop-inq" data-toggle="tooltip" data-placement="right" title="Relação de Proprietários e Inquilinos">
-                            <i class="fas fa-users mr-1"></i>Proprietários e Inquilinos
-                        </a>
-                    
+                    </div>
+
+                    <div class="alert alert-success mt-3 collapse" id="alert-sucesso-excluir">
+                        <strong>Sucesso!</strong> locação excluída com sucesso!
+                        <button type="button" class="close" id="btn-alert-sucesso-excluir">&times;</button>
+                    </div>
+    
+                    <div class="alert alert-danger mt-3 collapse" id="alert-erro-excluir">
+                        <strong>Erro!</strong> erro ao excluir locação!
+                        <button type="button" class="close" id="btn-alert-erro-excluir">&times;</button>
+                    </div>
+
+                    <div class="modal fade" id="modalExcluir" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <p class="font-weight-bold">Confirmação</p>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Deseja realmente excluir essa locação?</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-primary sim-excluir">
+                                        <i class="far fa-check-circle mr-1"></i>Sim
+                                    </button>
+                                    <button type="button" class="btn btn-danger" data-dismiss="modal" aria-label="Não">
+                                        <i class="fas fa-times-circle mr-1"></i>Não
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="mt-3 mb-4">
@@ -255,6 +285,22 @@
 
                     </div>
 
+                    <div class="alert alert-success mt-3 collapse" id="alert-sucesso">
+                        <strong>Sucesso!</strong> locação salvo/atualizado com sucesso!
+                        <button type="button" class="close" id="btn-alert-sucesso">&times;</button>
+                    </div>
+
+                    <div class="alert alert-danger mt-3 collapse" id="alert-erro">
+                        <strong>Erro!</strong> erro ao salvar/atualizar locação!
+                        <button type="button" class="close" id="btn-alert-erro">&times;</button>
+                    </div>
+
+                    <div class="alert alert-warning mt-3 collapse" id="alert-aviso">
+                        <strong>Aviso!</strong> Campos vazios, por favor, preencha os campos obrigatórios!
+                        <button type="button" class="close" id="btn-alert-aviso">&times;</button>
+                    </div>
+
+
                 </div>
 
             </div>
@@ -455,6 +501,10 @@
     ?>
 
     <script src="js/repository/LocacaoRepository.js"></script>
+    <script src="js/repository/PessoaRepository.js"></script>
+    <script src="js/repository/ProprietarioRepository.js"></script>
+    <script src="js/repository/InquilinoRepository.js"></script>
+    <script src="js/repository/ImovelRepository.js"></script>
     <script src="js/controller/LocacaoController.js"></script>
     <script src="js/indexLocacao.js"></script>
 </body>

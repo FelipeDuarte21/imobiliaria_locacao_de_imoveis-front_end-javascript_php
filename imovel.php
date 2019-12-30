@@ -23,12 +23,12 @@
                     </div>
 
                     <div class="alert alert-success mt-3 collapse" id="alert-sucesso-excluir">
-                        <strong>Sucesso!</strong> proprietário excluído com sucesso!
+                        <strong>Sucesso!</strong> imóvel excluído com sucesso!
                         <button type="button" class="close" id="btn-alert-sucesso-excluir">&times;</button>
                     </div>
     
                     <div class="alert alert-danger mt-3 collapse" id="alert-erro-excluir">
-                        <strong>Erro!</strong> erro ao excluir proprietário!
+                        <strong>Erro!</strong> erro ao excluir imóvel!
                         <button type="button" class="close" id="btn-alert-erro-excluir">&times;</button>
                     </div>
 

@@ -316,24 +316,19 @@ class ImovelController extends BaseController{
             this.controleModal(3,event => {
                 event.preventDefault();
 
-                this.controleModal(3, event => {
-                    event.preventDefault();
-
-                    this.imovelRepository.excluir(JSON.stringify(imovel),
-                        data => {
-                            this.controleModal(2);
-                            this.exibirMsgSucesso(2);
-                            super.gerenciarSessionStore(4,this.nomeSession,imovel,"idImovel");
-                            this.listarImoveis();
-                        },
-                        error => {
-                            this.controleModal(2);
-                            this.exibirMsgErro(2);
-                            console.log(error);
-                        }
-                    );
-
-                });
+                this.imovelRepository.excluir(JSON.stringify(imovel),
+                    data => {
+                        this.controleModal(2);
+                        this.exibirMsgSucesso(2);
+                        super.gerenciarSessionStore(4,this.nomeSession,imovel,"idImovel");
+                        this.listarImoveis();
+                    },
+                    error => {
+                        this.controleModal(2);
+                        this.exibirMsgErro(2);
+                        console.log(error);
+                    }
+                );
 
             });
 
