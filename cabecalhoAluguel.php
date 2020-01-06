@@ -23,7 +23,7 @@
                 </li>
 
                 <li class="nav-item mr-2" id="aluguel">
-                    <a href="#" class="nav-link">
+                    <a href="aluguel.php" class="nav-link">
                         <i class="fas fa-fw fa-hand-holding-usd"></i>
                         <span class="nav-link-text">Aluguel</span>
                     </a>

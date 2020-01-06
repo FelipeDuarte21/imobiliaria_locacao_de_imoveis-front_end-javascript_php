@@ -15,10 +15,9 @@ class BaseController{
         let bairro = endereco.logradouroCep.bairro.nome;
         let cidade = endereco.logradouroCep.bairro.cidade.nome;
         let estado = endereco.logradouroCep.bairro.cidade.estado.nome;
-        let cep = endereco.logradouroCep.cep;
+        let cep = this.utilitarios.mascaraCep(endereco.logradouroCep.cep);
 
-        let enderecoCompleto = `${logradouro} ${numero} ${(complemento) != null ? complemento: " "}
-        ${bairro} - ${cidade} / ${estado} - CEP: ${cep}`;
+        let enderecoCompleto = `${logradouro} ${numero} ${(complemento) != null ? complemento: " "} ${bairro} - ${cidade} / ${estado} - CEP: ${cep}`;
 
         return enderecoCompleto;
     }
