@@ -111,27 +111,14 @@ class LocacaoController extends BaseController{
 
     listarLocacoes(){
 
-        let locacoes = super.gerenciarSessionStore(2,this.nomeSession);
-
-        let paginacao = locacoes => {
-            super.gerenciarPaginacao(locacoes,this.removerLinhas,this.addLinha,this.selectPaginas,this.ulPaginas);
-        };
-
-        if(!locacoes){
-
-            this.locacaoRepository.buscarTodos(
-                locacoes => {
-                    super.gerenciarSessionStore(1,this.nomeSession,locacoes)
-                    paginacao(locacoes);
-                },
-                error => {
-                    console.log(error);
-                }
-            );
-
-        }else{
-            paginacao(locacoes);
-        }
+        this.locacaoRepository.buscarTodos(
+            locacoes => {
+                super.gerenciarPaginacao(locacoes,this.removerLinhas,this.addLinha,this.selectPaginas,this.ulPaginas);
+            },
+            error => {
+                console.log(error);
+            }
+        );
 
     }
 
@@ -287,7 +274,6 @@ class LocacaoController extends BaseController{
                     data => {
                         this.controleModal(2);
                         this.exibirMsgSucesso(2);
-                        super.gerenciarSessionStore(4,this.nomeSession,locacao,"idLocacao");
                         this.listarLocacoes();
                     },
                     error => {
@@ -541,7 +527,6 @@ class LocacaoController extends BaseController{
             let sucesso  = (data) => {
                 this.exibirMsgSucesso(1);
                 this.resetarFormulario();
-                super.gerenciarSessionStore(3,this.nomeSession,data,"idLocacao");
             }
 
             let erro = (error) => {

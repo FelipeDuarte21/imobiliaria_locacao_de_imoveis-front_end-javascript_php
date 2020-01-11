@@ -9,7 +9,7 @@
             <ul class="navbar-nav mr-auto">
 
                 <li class="nav-item mr-2" id="home">
-                    <a href="#" class="nav-link">
+                    <a href="index.php" class="nav-link">
                         <i class="fas fa-fw fa-bars"></i>
                         <span class="nav-link-text">Home</span>
                     </a>

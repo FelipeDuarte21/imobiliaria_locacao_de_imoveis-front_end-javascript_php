@@ -39,55 +39,6 @@ class BaseController{
         }
     }
 
-    gerenciarSessionStore(opcao,nomeAttr,dados = null,id = null){
-
-        let dadosRetorno;
-
-        switch(opcao){
-            case 1://Colocar
-                sessionStorage.setItem(nomeAttr,JSON.stringify(dados));
-            break;
-            case 2: //Pegar
-                dadosRetorno = sessionStorage.getItem(nomeAttr);
-                if(dadosRetorno){
-                    dadosRetorno = JSON.parse(dadosRetorno);
-                }
-            break;
-            case 3: //Atualizar - Inserir
-                dadosRetorno = this.gerenciarSessionStore(2,nomeAttr);
-
-                let achou = false;
-                dadosRetorno.forEach((d,index) => {
-                    if(d[id] == dados[id]){
-                        dadosRetorno[index] = dados;
-                        achou = true;
-                    }
-                });
-
-                if(!achou){
-                    dadosRetorno.push(dados);
-                }
-
-                this.gerenciarSessionStore(1,nomeAttr,dadosRetorno);
-            break;
-            case 4: //Excluir
-                dadosRetorno = this.gerenciarSessionStore(2,nomeAttr);
-
-                let dadosFiltradas = [];
-        
-                dadosRetorno.forEach(d => {
-                    if(d[id] != dados[id]){
-                        dadosFiltradas.push(d);
-                    }
-                });
-        
-                this.gerenciarSessionStore(1,nomeAttr,dadosFiltradas);
-            break;
-        }
-
-        return dadosRetorno;
-    }
-
     gerenciarPaginacao(dados,removerLinhas,addLinha,cbQtdRegistros,ulPaginacao){
 
         if(dados){

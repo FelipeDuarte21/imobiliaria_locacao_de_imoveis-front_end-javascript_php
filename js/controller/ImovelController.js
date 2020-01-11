@@ -104,29 +104,16 @@ class ImovelController extends BaseController{
         this.formEl.reset();
     }
 
-    listarImoveis(){
+    listarImoveis(){        
 
-        let imoveis = super.gerenciarSessionStore(2,this.nomeSession);
-
-        let paginacao = imoveis => {
-            super.gerenciarPaginacao(imoveis,this.removerLinhas,this.addLinha,this.selectPaginas,this.ulPaginas);
-        };
-
-        if(!imoveis){
-
-            this.imovelRepository.buscarTodos(
-                imoveis => {
-                    super.gerenciarSessionStore(1,this.nomeSession,imoveis);
-                    paginacao(imoveis);
-                },
-                error => {
-                    console.log(error);
-                }
-            );
-
-        }else{
-            paginacao(imoveis);
-        }
+        this.imovelRepository.buscarTodos(
+            imoveis => {
+                super.gerenciarPaginacao(imoveis,this.removerLinhas,this.addLinha,this.selectPaginas,this.ulPaginas);
+            },
+            error => {
+                console.log(error);
+            }
+        );
 
     }
 
@@ -320,7 +307,6 @@ class ImovelController extends BaseController{
                     data => {
                         this.controleModal(2);
                         this.exibirMsgSucesso(2);
-                        super.gerenciarSessionStore(4,this.nomeSession,imovel,"idImovel");
                         this.listarImoveis();
                     },
                     error => {
@@ -448,7 +434,6 @@ class ImovelController extends BaseController{
             let sucesso  = (data) => {
                 this.exibirMsgSucesso(1);
                 this.resetarFormulario();
-                super.gerenciarSessionStore(3,this.nomeSession,data,"idImovel");
             }
 
             let erro = (error) => {
